@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import com.review.product.model.Admin;
 import com.review.product.repository.AdminRepository;
-import com.review.product.service.AdminServiceImpl;
+import com.review.product.service.AdminService;
 
 @SpringBootTest
 public class AdminServiceTest{
@@ -18,7 +18,7 @@ public class AdminServiceTest{
 	//private WebApplicationContext webApplicationContext;
 	
 	@Autowired
-	private AdminServiceImpl adminServiceImpl;
+	private AdminService adminService;
 	
 	@MockBean
 	private AdminRepository adminRepository;
@@ -29,20 +29,20 @@ public class AdminServiceTest{
 	public void validateLoginTest() {
 		Admin admin = new Admin(1,"admin","1234");
 		when(adminRepository.findAdminByUsernameAndPassword(admin.getAdminUsername(),admin.getAdminPassword())).thenReturn(admin);
-		Assertions.assertEquals(true, adminServiceImpl.validateLogin(admin));
+		Assertions.assertEquals(true, adminService.validateLogin(admin));
 	}
 	
 	@Test
 	public void validateLoginForIncorrectPasswordTest() {
 		Admin admin = new Admin(1,"admin","123");
 		when(adminRepository.findAdminByUsernameAndPassword(admin.getAdminUsername(),admin.getAdminPassword())).thenReturn(null);
-		Assertions.assertEquals(false, adminServiceImpl.validateLogin(admin));
+		Assertions.assertEquals(false, adminService.validateLogin(admin));
 	}
 	
 	@Test
 	public void validateLoginForIncorrectUsernameTest() {
 		Admin admin = new Admin(1,"adm","1234");
 		when(adminRepository.findAdminByUsernameAndPassword(admin.getAdminUsername(),admin.getAdminPassword())).thenReturn(null);
-		Assertions.assertEquals(false, adminServiceImpl.validateLogin(admin));
+		Assertions.assertEquals(false, adminService.validateLogin(admin));
 	}
 }

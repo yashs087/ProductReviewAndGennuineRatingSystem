@@ -1,10 +1,89 @@
 package com.review.product.service;
 
-import com.review.product.model.Product;
+import java.util.List;
 
-public interface ProductService {
+import javax.transaction.Transactional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.review.product.model.Product;
+import com.review.product.repository.ProductRepository;
+
+//Service Class for Product
+@Service
+@Transactional
+public class ProductService {
 	
-	public Product addProduct(Product product);
+	private Logger log = LoggerFactory.getLogger(ProductService.class);
+
+	@Autowired
+	private ProductRepository productRepo;
 	
-	public boolean deleteProduct(int productID);
+	private Product prod;
+	
+	// Method to add a product to the database
+	public Product addProduct(Product product) {
+		if(product.getProductID()==0) {
+			return null;
+		}
+		log.debug("ProductService's addProduct method invoked");
+		prod = productRepo.save(product);
+		return prod;
+	}
+	
+	// Method to delete a product from the database
+	public boolean deleteProduct(int productID) {
+		log.debug("ProductService's deleteProduct method invoked");
+		 prod = productRepo.findById(productID).get();
+		 if(prod!=null) {
+			 productRepo.deleteById(productID);
+			 return true;
+		 }
+		 return false;
+	}
+	
+	//Method to update a product's details in the database
+	public Product updateProduct(int productID,Product product) {
+		log.debug("ProductService's updateProduct method invoked");
+		prod = productRepo.findById(productID).get();
+		if(prod!=null) {
+			prod.setProductName(product.getProductName());
+			prod.setProductPrice(product.getProductPrice());
+			prod.setProductDescription(product.getProductDescription());
+			return prod;
+		}
+		return null;
+	}
+	
+	//Method to display all products
+	public List<Product> getAllProduct(){
+		log.debug("ProductService's getAllProduct method invoked");
+		List<Product> list =  (List<Product>) productRepo.findAll();
+		return list;
+	}
+	
+	//Method to display top rated products
+	public List<Product> getBestProduct(String category){
+		log.debug("ProductService's getCategory method invoked");
+		List<Product> list = (List<Product>) productRepo.findBestProduct(category);
+		return list;
+	}
+	
+	// Method to find product
+	public List<Product> getProductDescription(String keyword){
+		log.debug("ProductService's getProductDescription method invoked");
+		List<Product> product = (List<Product>) productRepo.findByProductDescription(keyword);
+		return product;
+	}
+	
+	public Product getProduct(int productID) {
+		prod = productRepo.findById(productID).get();
+		if(prod!=null) {
+			return prod;
+		}
+		return null;
+	}
 }

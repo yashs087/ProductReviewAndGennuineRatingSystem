@@ -10,13 +10,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.review.product.model.Customer;
 import com.review.product.repository.CustomerRepository;
-import com.review.product.service.CustomerServiceImpl;
+import com.review.product.service.CustomerService;
 
 @SpringBootTest
 public class CustomerServiceTest{
 	
 	@Autowired
-	private CustomerServiceImpl customerServiceImpl;
+	private CustomerService customerService;
 	
 	@MockBean
 	private CustomerRepository customerRepository;
@@ -25,27 +25,27 @@ public class CustomerServiceTest{
 	public void signUpTest() {
 		Customer customer = new Customer(1,"ABCDEF","Abcd@1234","XYZ",9090909090L);
 		when(customerRepository.save(customer)).thenReturn(customer);
-		Assertions.assertEquals(customer, customerServiceImpl.signUp(customer));
+		Assertions.assertEquals(customer, customerService.signUp(customer));
 	}
 	
 	@Test
 	public void signUpWithInvalidPasswordTest() {
 		Customer customer = new Customer(1,"abcde","abcd","XYZ",9090909090L);
 		when(customerRepository.save(customer)).thenReturn(customer);
-		Assertions.assertEquals(null, customerServiceImpl.signUp(customer));
+		Assertions.assertEquals(null, customerService.signUp(customer));
 	}
 	
 	@Test
 	public void signUpWithInvalidUsername() {
 		Customer customer = new Customer(1,"abcde","Abcd@1234","XYZ",9090909090L);
 		when(customerRepository.save(customer)).thenReturn(customer);
-		Assertions.assertEquals(null, customerServiceImpl.signUp(customer));
+		Assertions.assertEquals(null, customerService.signUp(customer));
 	}
 	
 	@Test
 	public void signUpWithInvalidPhoneNumber() {
 		Customer customer = new Customer(1,"abcde","Abcd@1234","XYZ",9090);
 		when(customerRepository.save(customer)).thenReturn(customer);
-		Assertions.assertEquals(null, customerServiceImpl.signUp(customer));
+		Assertions.assertEquals(null, customerService.signUp(customer));
 	}
 }

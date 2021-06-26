@@ -1,11 +1,8 @@
 package com.review.product.exception;
 
+@SuppressWarnings("serial")
 public class ProductNotFoundException extends RuntimeException{
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	private String message;
 
 	

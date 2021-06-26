@@ -13,7 +13,7 @@ public class Validate {
 	
 	//Method to validate customer details
 	public Boolean validate(Customer customer) {
-		if(checkPassword(customer.getCustPassword()) && checkUsername(customer.getCustUsername()) && checkPhone(customer.getCustPhone())) {
+		if(checkPassword(customer.getCustPassword()) && checkUsername(customer.getCustUsername())) {
 			return true;
 		}
 		return false;
@@ -36,15 +36,6 @@ public class Validate {
 	//Method to validate Username
 	private Boolean checkUsername(String username) {
 		if(username!=null && username.length()>5) {
-			return true;
-		}
-		return false;
-	}
-	
-	//Method to validate PhoneNumber
-	private Boolean checkPhone(long phoneNumber) {
-		String phone = String.valueOf(phoneNumber);
-		if(phone.length() ==  10) {
 			return true;
 		}
 		return false;

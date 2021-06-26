@@ -13,13 +13,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.review.product.model.Product;
 import com.review.product.repository.ProductRepository;
-import com.review.product.service.ProductServiceImpl;
+import com.review.product.service.ProductService;
 
 @SpringBootTest
 public class ProductServiceTest {
 
 	@Autowired
-	private ProductServiceImpl productServiceImpl;
+	private ProductService productService;
 	
 	@MockBean
 	private ProductRepository productRepository;
@@ -28,44 +28,45 @@ public class ProductServiceTest {
 	public void addProductTest() {
 		Product product = new Product(1,"Iphone 10","Mobile Phone",60000.00,"Great quality");
 		when(productRepository.save(product)).thenReturn(product);
-		Assertions.assertEquals(product, productServiceImpl.addProduct(product));
+		Assertions.assertEquals(product, productService.addProduct(product));
 	}
 	
 	@Test
 	public void addProductWithNegativeIdTest() {
 		Product product = new Product(-1,"Iphone 10","Mobile Phone",60000.00,"Great quality");
 		when(productRepository.save(product)).thenReturn(product);
-		Assertions.assertEquals(null, productServiceImpl.addProduct(product));
+		Assertions.assertEquals(null, productService.addProduct(product));
 	}
 	
 	@Test
 	public void addProductWithIdAsZeroTest() {
 		Product product = new Product(0,"Iphone 10","Mobile Phone",60000.00,"Great quality");
 		when(productRepository.save(product)).thenReturn(product);
-		Assertions.assertEquals(null, productServiceImpl.addProduct(product));
+		Assertions.assertEquals(null, productService.addProduct(product));
 	}
 	
 	@Test
 	public void deleteProductTest() {
 		Product product = new Product(2,"Iphone 10","Mobile Phone",60000.00,"Great quality");
-		productServiceImpl.addProduct(product);
-		boolean result = productServiceImpl.deleteProduct(product.getProductID());
+		productService.addProduct(product);
+		boolean result = productService.deleteProduct(product.getProductID());
 		Assertions.assertEquals(true,result);
 		
+		//verify(productRepository,times(1)).deleteById(product.getProductID());
 	}
 	
 	@Test
 	public void updateProductTest() {
 		Product product = new Product(1,"Iphone 10","Mobile Phone",60000.00,"Great quality");
-		productServiceImpl.addProduct(product);
+		productService.addProduct(product);
 		product.setProductName("Iphone 11");
 		when(productRepository.save(product)).thenReturn(product);
-		Assertions.assertEquals(product, productServiceImpl.updateProduct(product.getProductID(),product));
+		Assertions.assertEquals(product, productService.updateProduct(product.getProductID(),product));
 	}
 	
 	@Test
 	public void getAllProductsTest() {
 		when(productRepository.findAll()).thenReturn(Stream.of(new Product(1,"Iphone 10","Mobile Phone",60000.00,"Great quality"),new Product(2,"OnePlus 4","Mobile Phone",55000.00,"Good phone")).collect(Collectors.toList()));
-		Assertions.assertEquals(2, productServiceImpl.getAllProduct().size());
+		Assertions.assertEquals(2, productService.getAllProduct().size());
 	}
 }

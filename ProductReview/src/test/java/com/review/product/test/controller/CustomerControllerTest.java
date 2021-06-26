@@ -22,9 +22,9 @@ import com.review.product.exception.ReviewNotFoundException;
 import com.review.product.model.Customer;
 import com.review.product.model.Product;
 import com.review.product.model.Review;
-import com.review.product.service.CustomerServiceImpl;
-import com.review.product.service.ProductServiceImpl;
-import com.review.product.service.ReviewServiceImpl;
+import com.review.product.service.CustomerService;
+import com.review.product.service.ProductService;
+import com.review.product.service.ReviewService;
 
 @SpringBootTest
 public class CustomerControllerTest {
@@ -33,18 +33,18 @@ public class CustomerControllerTest {
 	private CustomerController customerController;
 	
 	@MockBean
-	private ProductServiceImpl productServiceImpl;
+	private ProductService productService;
 	
 	@MockBean
-	private ReviewServiceImpl reviewServiceImpl;
+	private ReviewService reviewService;
 	
 	@MockBean
-	private CustomerServiceImpl customerServiceImpl;
+	private CustomerService customerService;
 	
 	@Test
 	public void signUpTest() {
 		Customer customer = new Customer(1,"ABCDEFG","Abcd@1234","Delhi",9090909090L);
-		when(customerServiceImpl.signUp(customer)).thenReturn(customer);
+		when(customerService.signUp(customer)).thenReturn(customer);
 		ResponseEntity<Customer> expected = new ResponseEntity<Customer>(customer,HttpStatus.ACCEPTED);
 		ResponseEntity<Customer> actual = customerController.signUp(customer);
 		Assertions.assertEquals(expected, actual);
@@ -53,7 +53,7 @@ public class CustomerControllerTest {
 	@Test
 	public void signUpWithInvalidUsernameTest() {
 		Customer customer = new Customer(1,"ABC","Abcd@1234","Delhi",9090909090L);
-		when(customerServiceImpl.signUp(customer)).thenReturn(null);
+		when(customerService.signUp(customer)).thenReturn(null);
 		Exception e = Assertions.assertThrows(CustomerNotFoundException.class,() -> {customerController.signUp(customer);});
 		Assertions.assertEquals("Customer cannot be Added", e.getMessage());
 	}
@@ -61,7 +61,7 @@ public class CustomerControllerTest {
 	@Test
 	public void signUpWithInvalidPasswordTest() {
 		Customer customer = new Customer(1,"ABCDEF","abcd@12","Delhi",9090909090L);
-		when(customerServiceImpl.signUp(customer)).thenReturn(null);
+		when(customerService.signUp(customer)).thenReturn(null);
 		Exception e = Assertions.assertThrows(CustomerNotFoundException.class,() -> {customerController.signUp(customer);});
 		Assertions.assertEquals("Customer cannot be Added", e.getMessage());
 	}
@@ -69,7 +69,7 @@ public class CustomerControllerTest {
 	@Test
 	public void signUpWithInvalidPhoneNumberTest() {
 		Customer customer = new Customer(1,"ABC","Abcd@1234","Delhi",909);
-		when(customerServiceImpl.signUp(customer)).thenReturn(null);
+		when(customerService.signUp(customer)).thenReturn(null);
 		Exception e = Assertions.assertThrows(CustomerNotFoundException.class,() -> {customerController.signUp(customer);});
 		Assertions.assertEquals("Customer cannot be Added", e.getMessage());
 	}
@@ -77,16 +77,16 @@ public class CustomerControllerTest {
 	@Test
 	public void loginTest() {
 		Customer customer = new Customer(1,"ABCDEFG","Abcd@1234","Delhi",9090909090L);
-		when(customerServiceImpl.validateLogin(customer)).thenReturn(true);
+		when(customerService.validateLogin(customer)).thenReturn(true);
 		ResponseEntity<Boolean> expected = new ResponseEntity<Boolean>(true,HttpStatus.FOUND);
-		ResponseEntity<Boolean> actual = customerController.login(customer);
+		ResponseEntity<String> actual = customerController.login(customer);
 		Assertions.assertEquals(expected, actual);
 	}
 	
 	@Test
 	public void loginWithNullCustomerTest() {
 		Customer customer = null;
-		when(customerServiceImpl.validateLogin(customer)).thenReturn(false);
+		when(customerService.validateLogin(customer)).thenReturn(false);
 		Exception e = Assertions.assertThrows(InvalidLoginCredentialsException.class,() -> {customerController.login(customer);});
 		Assertions.assertEquals("Invalid Credentials", e.getMessage());
 	}
@@ -94,7 +94,7 @@ public class CustomerControllerTest {
 	@Test
 	public void getProductByDescriptionTest() {
 		List<Product> list = Stream.of(new Product(1,"Iphone 10","Mobile Phone",60000.00,"Great quality"),new Product(2,"OnePlus 4","Mobile Phone",55000.00,"Great phone")).collect(Collectors.toList()); 
-		when(productServiceImpl.getProductDescription("Great")).thenReturn(list);
+		when(productService.getProductDescription("Great")).thenReturn(list);
 		ResponseEntity<List<Product>> expected = new ResponseEntity<List<Product>>(list,HttpStatus.FOUND);
 		ResponseEntity<List<Product>> actual = customerController.getProductByDescription("Great");
 		Assertions.assertEquals(expected,actual);
@@ -103,7 +103,7 @@ public class CustomerControllerTest {
 	@Test
 	public void getProductByDescriptionNullListTest() {
 		List<Product> list = null; 
-		when(productServiceImpl.getProductDescription("Great")).thenReturn(list);
+		when(productService.getProductDescription("Great")).thenReturn(list);
 		Exception e = Assertions.assertThrows(ProductNotFoundException.class,() -> {customerController.getProductByDescription("Great");});
 		Assertions.assertEquals("Products not found", e.getMessage());
 	}
@@ -111,7 +111,7 @@ public class CustomerControllerTest {
 	@Test
 	public void getAllProductsTest() {
 		List<Product> list = Stream.of(new Product(1,"Iphone 10","Mobile Phone",60000.00,"Great quality"),new Product(2,"OnePlus 4","Mobile Phone",55000.00,"Great phone")).collect(Collectors.toList()); 
-		when(productServiceImpl.getAllProduct()).thenReturn(list);
+		when(productService.getAllProduct()).thenReturn(list);
 		ResponseEntity<List<Product>> expected = new ResponseEntity<List<Product>>(list,HttpStatus.FOUND);
 		ResponseEntity<List<Product>> actual = customerController.getAllProducts();
 		Assertions.assertEquals(expected,actual);
@@ -120,7 +120,7 @@ public class CustomerControllerTest {
 	@Test
 	public void getAllProductsWithNullListTest() {
 		List<Product> list = null; 
-		when(productServiceImpl.getAllProduct()).thenReturn(list);
+		when(productService.getAllProduct()).thenReturn(list);
 		Exception e = Assertions.assertThrows(ProductNotFoundException.class,() -> {customerController.getAllProducts();});
 		Assertions.assertEquals("Products not found", e.getMessage());
 	}
@@ -131,9 +131,9 @@ public class CustomerControllerTest {
 		Product p = new Product(1,"Iphone 10","Mobile Phone",60000.00,"Great quality");
 		Customer customer = new Customer(1,"ABCDEFG","Abcd@1234","Delhi",9090909090L);
 		Review review = new Review(1,p,customer,4,"Good phone");
-		when(reviewServiceImpl.addReview(p.getProductName(), review,customer.getCustomerID())).thenReturn(review);
+		when(reviewService.addReview(p.getProductName(), review,1)).thenReturn(review);
 		ResponseEntity<Review> expected = new ResponseEntity<Review>(review,HttpStatus.OK);
-		ResponseEntity<Review> actual = customerController.giveReview(p.getProductName(), billNumber, review,customer.getCustomerID());
+		ResponseEntity<Review> actual = customerController.giveReview(p.getProductName(), billNumber, review,1);
 		Assertions.assertEquals(expected, actual);
 	}
 	
@@ -141,17 +141,16 @@ public class CustomerControllerTest {
 	public void giveNullReviewTest() {
 		String billNumber = "ABCDEF12345";
 		Product p = new Product(1,"Iphone 10","Mobile Phone",60000.00,"Great quality");
-		Customer customer = new Customer(1,"ABCDEFG","Abcd@1234","Delhi",9090909090L);
 		Review review = null;
-		when(reviewServiceImpl.addReview(p.getProductName(), review,customer.getCustomerID())).thenReturn(review);
-		Exception e = Assertions.assertThrows(ReviewNotFoundException.class,() -> {customerController.giveReview(p.getProductName(), billNumber, review,customer.getCustomerID());});
+		when(reviewService.addReview(p.getProductName(), review,1)).thenReturn(review);
+		Exception e = Assertions.assertThrows(ReviewNotFoundException.class,() -> {customerController.giveReview(p.getProductName(), billNumber, review,1);});
 		Assertions.assertEquals("Review cannot be Added", e.getMessage());
 	}
 	
 	@Test
 	public void getBestProductTest() {
 		List<Product> list = Stream.of(new Product(1,"Iphone 10","Mobile Phone",60000.00,"Great quality"),new Product(2,"OnePlus 4","Mobile Phone",55000.00,"Great phone")).collect(Collectors.toList());
-		when(productServiceImpl.getBestProduct("Mobile Phone")).thenReturn(list);
+		when(productService.getBestProduct("Mobile Phone")).thenReturn(list);
 		ResponseEntity<List<Product>> expected = new ResponseEntity<List<Product>>(list,HttpStatus.FOUND);
 		ResponseEntity<List<Product>> actual = customerController.getBestProduct("Mobile Phone");
 		Assertions.assertEquals(expected,actual);
@@ -160,7 +159,7 @@ public class CustomerControllerTest {
 	@Test
 	public void getBestProductWithNullListTest() {
 		List<Product> list = null;
-		when(productServiceImpl.getBestProduct("Mobile Phone")).thenReturn(list);
+		when(productService.getBestProduct("Mobile Phone")).thenReturn(list);
 		Exception e = Assertions.assertThrows(ProductNotFoundException.class,() -> {customerController.getBestProduct("Mobile Phone");});
 		Assertions.assertEquals("Products not found", e.getMessage());
 	}
@@ -172,7 +171,7 @@ public class CustomerControllerTest {
 		Product product = new Product(1,"Iphone 10","Mobile Phone",60000.00,"Great quality");
 		List<Review> reviewList = Stream.of(new Review(1,product,customer,4,"Good product"),new Review(2,product,customer2,5,"Great Product")).collect(Collectors.toList());
 		Product p = new Product(1,"Iphone 10","Mobile Phone",60000.00,"Great quality");
-		when(reviewServiceImpl.getReview(p.getProductName())).thenReturn(reviewList);
+		when(reviewService.getReview(p.getProductName())).thenReturn(reviewList);
 		ResponseEntity<List<Review>> expected = new ResponseEntity<List<Review>>(reviewList,HttpStatus.FOUND);
 		ResponseEntity<List<Review>> actual = customerController.getReview(p.getProductName());
 		Assertions.assertEquals(expected,actual);
@@ -182,7 +181,7 @@ public class CustomerControllerTest {
 	public void getReviewWithNullListTest() {
 		List<Review> reviewList = null;
 		Product p = new Product(1,"Iphone 10","Mobile Phone",60000.00,"Great quality");
-		when(reviewServiceImpl.getReview(p.getProductName())).thenReturn(reviewList);
+		when(reviewService.getReview(p.getProductName())).thenReturn(reviewList);
 		Exception e = Assertions.assertThrows(ReviewNotFoundException.class,() -> {customerController.getReview(p.getProductName());});
 		Assertions.assertEquals("Product Review not found check product name", e.getMessage());
 	}

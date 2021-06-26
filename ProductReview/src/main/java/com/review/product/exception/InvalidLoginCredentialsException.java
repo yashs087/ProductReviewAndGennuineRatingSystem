@@ -1,11 +1,8 @@
 package com.review.product.exception;
 
+@SuppressWarnings("serial")
 public class InvalidLoginCredentialsException extends RuntimeException{
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	private String message;
 
 	public InvalidLoginCredentialsException(String message) {
